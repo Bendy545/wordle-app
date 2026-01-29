@@ -20,11 +20,11 @@ jobs:
             # Navigate to app directory
             cd /var/www/wordle-app
 
-	    cp .env .env.backup
+            cp .env .env.backup
             
             git pull origin main
 
-	    mv .env.backup .env
+            mv .env.backup .env
             
             # Install dependencies
             composer install --no-dev --optimize-autoloader --no-interaction
