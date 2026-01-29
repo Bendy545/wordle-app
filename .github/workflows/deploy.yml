@@ -20,24 +20,40 @@ jobs:
             # Navigate to app directory
             cd /var/www/wordle-app
             
-            # If first deployment, clone the repo
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/Bendy545/wordle-app.git .
+            # Backup .env if exists
+            if [ -f ".env" ]; then
+              cp .env .env.backup
             fi
             
-            # Pull latest changes from main
-            git fetch origin main
-            git reset --hard origin/main
+            # First deployment - clone repo
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/Bendy545/wordle-app.git .
+            else
+              # Pull latest changes
+              git fetch origin main
+              git reset --hard origin/main
+            fi
             
-            # Install dependencies (production mode)
+            # Restore .env
+            if [ -f ".env.backup" ]; then
+              mv .env.backup .env
+            fi
+            
+            # Fix ownership before composer
+            sudo chown -R deployer:www-data /var/www/wordle-app
+            
+            # Install dependencies
             composer install --no-dev --optimize-autoloader --no-interaction
             
-            # Run database migrations
-            php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+            # Create var directory if needed
+            mkdir -p var/cache var/log
             
-            # Clear and warm up cache
-            php bin/console cache:clear --env=prod --no-interaction
-                        
-            # Set proper permissions
-            sudo chmod -R 775 var/
+            # Run migrations if .env exists
+            if [ -f ".env" ]; then
+              php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true
+              php bin/console cache:clear --env=prod --no-interaction || true
+            fi
+            
+            # Set final permissions
+            sudo chmod -R 775 var/ 2>/dev/null || true
             sudo chown -R deployer:www-data /var/www/wordle-app
