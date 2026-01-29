@@ -37,8 +37,7 @@ jobs:
             
             # Clear and warm up cache
             php bin/console cache:clear --env=prod --no-interaction
-            php bin/console cache:warmup --env=prod --no-interaction
-            
+                        
             # Set proper permissions
-            chmod -R 775 var/
-            chown -R deployer:www-data /var/www/wordle-app
+            sudo chmod -R 775 var/
+            sudo chown -R deployer:www-data /var/www/wordle-app
