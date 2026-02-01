@@ -5,6 +5,13 @@
 {% block body %}
 <div style="text-align: center; margin-top: 50px;">
     <h1>{{ message }}</h1>
+    
+    {% if hasWords %}
+        <p>Today's word is: <strong>{{ randomWord }}</strong></p>
+    {% else %}
+        <p>No words available in the database. Please add some words first!</p>
+    {% endif %}
+    
     <p>Your Wordle game will go here!</p>
 </div>
 {% endblock %}
