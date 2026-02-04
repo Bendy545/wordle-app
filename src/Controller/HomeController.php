@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\WordRepository;
+use App\Repository\GameStateRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -10,9 +10,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(WordRepository $wordRepository): Response
+    public function index(GameStateRepository $gameStateRepository): Response
     {
-        $word = $wordRepository->getRandomWord();
+        $state = $gameStateRepository->getSingleton();
+        $word = $state?->getCurrentWord();
 
         return $this->render('home/index.html.twig', [
             'message' => 'Welcome to ITordle! ',

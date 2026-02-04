@@ -42,7 +42,7 @@ class WordRepository extends ServiceEntityRepository
     {
         $count = $this->createQueryBuilder('w')
             ->select('COUNT(w.id)')
-            ->where('w.word = :word')
+            ->where('w.name = :word')
             ->setParameter('word', strtoupper($word))
             ->getQuery()
             ->getSingleScalarResult();
@@ -55,7 +55,7 @@ class WordRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('w')
             ->where('w.isActive = :active')
             ->setParameter('active', true)
-            ->orderBy('w.word', 'ASC')
+            ->orderBy('w.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
