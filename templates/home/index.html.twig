@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Wordle Game{% endblock %}
+{% block title %}ITordle{% endblock %}
 
 {% block body %}
-<div style="text-align: center; margin-top: 50px;">
+<div class="game-container" data-controller="wordle">
     <h1>{{ message }}</h1>
     
     {% if hasWords %}
@@ -12,6 +12,40 @@
         <p>No words available in the database. Please add some words first!</p>
     {% endif %}
     
-    <p>Your Wordle game will go here!</p>
+    <header class="game-header">
+        <h1>ITordle</h1>
+    </header>
+
+    <div class="board">
+        {% for row in 0..5 %}
+            <div class="row">
+                {% for col in 0..4 %}
+                    <div class="tile" data-row="{{ row }}" data-col="{{ col }}"></div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="keyboard">
+        <div class="keyboard-row">
+            {% for key in ['Q','W','E','R','T','Y','U','I','O','P'] %}
+                <button class="key" data-key="{{ key }}" data-action="click->wordle#keyPress">{{ key }}</button>
+            {% endfor %}
+        </div>
+        <div class="keyboard-row">
+            <div class="spacer-half"></div>
+            {% for key in ['A','S','D','F','G','H','J','K','L'] %}
+                <button class="key" data-key="{{ key }}" data-action="click->wordle#keyPress">{{ key }}</button>
+            {% endfor %}
+            <div class="spacer-half"></div>
+        </div>
+        <div class="keyboard-row">
+                <button class="key" data-key="Enter" data-action="click->wordle#keyPress">ENTER</button>
+            {% for key in ['Z','X','C','V','B','N','M'] %}
+                <button class="key" data-key="{{ key }}" data-action="click->wordle#keyPress">{{ key }}</button>
+            {% endfor %}
+            <button class="key key-wide" data-key="Backspace" data-action="click->wordle#keyPress">⌫</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
