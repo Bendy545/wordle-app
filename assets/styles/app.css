@@ -20,18 +20,19 @@ body {
     align-items: center;
     width: 100%;
     max-width: 500px;
-    padding: 0 8px;
+    height: 100%;
+    padding: 0 4px;
 }
 
 .game-header {
     width: 100%;
     text-align: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #3a3a3c;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
 }
 
 .game-header h1 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -41,9 +42,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 5px;
-    margin: 40px 0;
-    flex-grow: 1;
+    flex: 1;
+    padding: 8px 0;
 }
 
 .row {
@@ -52,17 +54,16 @@ body {
 }
 
 .tile {
-    width: 62px;
-    height: 62px;
+    width: 56px;
+    height: 56px;
     border: 2px solid #3a3a3c;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     text-transform: uppercase;
     color: #ffffff;
-    transition: border-color 0.1s;
 }
 
 .tile.filled {
@@ -83,40 +84,43 @@ body {
     background-color: #3a3a3c;
     border-color: #3a3a3c;
 }
+
+/* Keyboard - pinned to bottom */
 .keyboard {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding-bottom: 16px;
+    gap: 5px;
+    padding: 6px 0 8px 0;
+    margin-top: 30px;
     width: 100%;
 }
 
 .keyboard-row {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     width: 100%;
+    max-width: 484px;
 }
 
 .key {
-    height: 58px;
-    min-width: 43px;
-    padding: 0;
+    height: 50px;
+    padding: 0 6px;
     border: none;
     border-radius: 4px;
     background-color: #818384;
     color: #ffffff;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1;
-    max-width: 43px;
+    max-width: 40px;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.1s;
+    touch-action: manipulation;
 }
 
 .key:active {
@@ -124,8 +128,9 @@ body {
 }
 
 .key-wide {
-    max-width: 65px;
-    font-size: 0.75rem;
+    max-width: 58px;
+    flex: 1.5;
+    font-size: 0.7rem;
 }
 
 .key.correct {
@@ -145,40 +150,28 @@ body {
 }
 
 .tile.revealing {
-    animation: flip 0.5s ease;
+    animation: flip 0.35s ease;
 }
 
 @keyframes flip {
-    0% {
-        transform: rotateX(0deg);
-    }
-    50% {
-        transform: rotateX(90deg);
-    }
-    100% {
-        transform: rotateX(0deg);
-    }
+    0% { transform: rotateX(0deg); }
+    50% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
 }
 
 .tile.pop {
-    animation: pop 0.1s ease;
+    animation: pop 0.08s ease;
 }
 
 @keyframes pop {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.12);
-    }
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .toast {
     position: fixed;
-    top: 60px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #ffffff;
@@ -197,21 +190,15 @@ body {
     opacity: 1;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
     .tile {
-        width: 52px;
-        height: 52px;
-        font-size: 1.6rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
     }
 
     .key {
-        height: 50px;
-        min-width: 30px;
-        font-size: 0.75rem;
-    }
-
-    .key-wide {
-        max-width: 55px;
-        font-size: 0.65rem;
+        height: 44px;
+        font-size: 0.7rem;
     }
 }
