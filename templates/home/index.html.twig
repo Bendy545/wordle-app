@@ -5,12 +5,6 @@
 {% block body %}
 <div class="game-container" data-controller="wordle">
     
-    {% if hasWords %}
-        <p>Today's word is: <strong>{{ randomWord }}</strong></p>
-    {% else %}
-        <p>No words available in the database. Please add some words first!</p>
-    {% endif %}
-    
     <header class="game-header">
         <h1>ITordle</h1>
     </header>
