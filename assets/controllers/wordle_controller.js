@@ -10,6 +10,7 @@ export default class extends Controller {
         this.currentRow = 0;
         this.currentCol = 0;
         this.gameOver = false;
+        this.isRevealing = false;
 
         this.handlePhysicalKeyboard = this.handlePhysicalKeyboard.bind(this);
         document.addEventListener('keydown', this.handlePhysicalKeyboard);
@@ -46,7 +47,7 @@ export default class extends Controller {
     }
 
     addLetter(letter) {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isRevealing) return;
         if (this.currentCol >= this.maxColsValue) return;
 
         const tile = this.getTile(this.currentRow, this.currentCol);
@@ -59,7 +60,7 @@ export default class extends Controller {
     }
 
     deleteLetter() {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isRevealing) return;
         if (this.currentCol <= 0) return;
 
         this.currentCol--;
@@ -82,7 +83,7 @@ export default class extends Controller {
     }
 
     async submitGuess() {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isRevealing) return;
         if (this.currentCol < this.maxColsValue) {
             this.showMessage('Not enough letters');
             return;
@@ -91,6 +92,8 @@ export default class extends Controller {
         const guess = this.getCurrentWord();
 
         try {
+            this.isRevealing = true;
+
             const response = await fetch('/api/guess', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -100,12 +103,15 @@ export default class extends Controller {
             const data = await response.json();
 
             if (!response.ok) {
+                this.isRevealing = false;
                 this.showMessage(data.error || 'Something went wrong');
                 return;
             }
 
             await this.revealRow(data.result);
             this.updateKeyboard(data.result);
+
+            this.isRevealing = false;
 
             if (data.won) {
                 this.gameOver = true;
@@ -118,6 +124,7 @@ export default class extends Controller {
                 this.currentCol = 0;
             }
         } catch (error) {
+            this.isRevealing = false;
             this.showMessage('Connection Error');
         }
     }
