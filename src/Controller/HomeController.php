@@ -15,10 +15,14 @@ class HomeController extends AbstractController
         $state = $gameStateRepository->getSingleton();
         $word = $state?->getCurrentWord();
 
+        $slotId = null;
+        if ($state) {
+            $slotId = $state->getSlotDate()->format('Y-m-d') . '-' . $state->getCurrentSlot();
+        }
+
         return $this->render('home/index.html.twig', [
-            'message' => 'Welcome to ITordle! ',
-            'randomWord' => $word?->getName(),
             'hasWords' => $word !== null,
+            'slotId' => $slotId,
         ]);
     }
 }

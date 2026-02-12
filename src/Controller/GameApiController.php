@@ -29,11 +29,17 @@ class GameApiController extends AbstractController
             return $this->json(['error' => 'No active game'], 500);
         }
 
+        $slotId = $state->getSlotDate()->format('Y-m-d') . '-' . $state->getCurrentSlot();
+
         $answer = strtoupper($state->getCurrentWord()->getName());
         $result = $this->evaluate($guess, $answer);
         $won = $guess === $answer;
 
-        $response = ['result' => $result, 'won' => $won];
+        $response = [
+            'result' => $result,
+            'won' => $won,
+            'slotId' => $slotId
+        ];
 
         if ($won || !isset($data['remainingAttempts']) || $data['remainingAttempts'] <= 0) {
             $response['answer'] = $answer;
