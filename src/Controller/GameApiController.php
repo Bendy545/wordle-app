@@ -7,12 +7,15 @@ use App\Repository\WordRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GameApiController extends AbstractController
 {
+    private const MAX_ATTEMPTS = 6;
+
     #[Route('/api/guess', name: 'api_guess', methods: ['POST'])]
-    public function guess(Request $request, GameStateRepository $gameStateRepository, WordRepository $wordRepository): JsonResponse {
+    public function guess(Request $request, RequestStack $requestStack, GameStateRepository $gameStateRepository, WordRepository $wordRepository): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $guess = strtoupper(trim($data['guess'] ?? ''));
 
@@ -31,9 +34,22 @@ class GameApiController extends AbstractController
 
         $slotId = $state->getSlotDate()->format('Y-m-d') . '-' . $state->getCurrentSlot();
 
+        $session = $requestStack->getSession();
+        $sessionKey = 'wordle_' . $slotId;
+        $attempts = $session->get($sessionKey, 0);
+
+        if ($attempts >= self::MAX_ATTEMPTS) {
+            return $this->json(['error' => 'No attempts remaining'], 400);
+        }
+
         $answer = strtoupper($state->getCurrentWord()->getName());
         $result = $this->evaluate($guess, $answer);
         $won = $guess === $answer;
+
+        $attempts++;
+        $session->set($sessionKey, $attempts);
+
+        $gameOver = $won || $attempts >= self::MAX_ATTEMPTS;
 
         $response = [
             'result' => $result,
@@ -41,10 +57,10 @@ class GameApiController extends AbstractController
             'slotId' => $slotId
         ];
 
-        if ($won || !isset($data['remainingAttempts']) || $data['remainingAttempts'] <= 0) {
+        if ($gameOver) {
             $response['answer'] = $answer;
         }
-
+        
         return $this->json($response);
     }
 
