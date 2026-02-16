@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class WordRotationService
 {
+    private const SLOTS = [8, 10, 12, 14, 16];
+
     public function __construct(private WordRepository $wordRepository, private GameStateRepository $gameStateRepository, private EntityManagerInterface $entityManager, private string $timezone = 'Europe/Prague',)
     {
 
@@ -57,6 +59,21 @@ final class WordRotationService
             'date' => $slotDate,
             'word' => $newWord->getName(),
         ];
+    }
+
+    public function getNextRotationTime(?\DateTimeImmutable $now = null): \DateTimeImmutable
+    {
+        $tz = new \DateTimeZone($this->timezone);
+        $now = $now ?? new \DateTimeImmutable('now', $tz);
+        $hour = (int) $now->format('H');
+
+        foreach (self::SLOTS as $slot) {
+            if ($hour < $slot) {
+                return $now->setTime($slot, 0, 0);
+            }
+        }
+
+        return $now->modify('+1 day')->setTime(self::SLOTS[0], 0, 0);
     }
 
     private function isSameSlot(GameState $state, int $slot, \DateTimeImmutable $slotDate): bool

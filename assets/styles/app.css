@@ -148,6 +148,65 @@ body {
     80%      { transform: translateY(-6px); }
 }
 
+.countdown {
+    flex-shrink: 0;
+    text-align: center;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    padding: 0;
+}
+
+.countdown.visible {
+    max-height: 80px;
+    opacity: 1;
+    padding: 6px 0 2px;
+}
+
+.countdown-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.countdown-time {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.countdown-segment {
+    display: inline-flex;
+    align-items: baseline;
+}
+
+.countdown-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    min-width: 1.7em;
+    text-align: center;
+    display: inline-block;
+}
+
+.countdown-unit {
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+.countdown-separator {
+    font-size: 1.2rem;
+    font-weight: 700;
+    opacity: 0.5;
+    margin: 0 1px;
+}
+
 .keyboard {
     display: flex;
     flex-direction: column;
