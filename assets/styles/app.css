@@ -76,10 +76,13 @@ body {
     text-transform: uppercase;
     color: #ffffff;
     transition: border-color 0.1s;
+    transform-style: preserve-3d;
+    perspective: 500px;
 }
 
 .tile.filled {
     border-color: #565758;
+    animation: pop 0.1s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .tile.correct {
@@ -95,6 +98,54 @@ body {
 .tile.absent {
     background-color: #3a3a3c;
     border-color: #3a3a3c;
+}
+
+@keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.14); }
+    100% { transform: scale(1); }
+}
+
+.tile.revealing {
+    animation: flipIn 0.25s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.tile.reveal-out {
+    animation: flipOut 0.25s cubic-bezier(0, 0.55, 0.45, 1) forwards;
+}
+
+@keyframes flipIn {
+    0%   { transform: rotateX(0deg); }
+    100% { transform: rotateX(90deg); }
+}
+
+@keyframes flipOut {
+    0%   { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
+}
+
+.row.shake {
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%      { transform: translateX(-6px); }
+    30%      { transform: translateX(5px); }
+    50%      { transform: translateX(-4px); }
+    70%      { transform: translateX(3px); }
+    90%      { transform: translateX(-1px); }
+}
+
+.tile.dance {
+    animation: dance 0.5s ease;
+}
+
+@keyframes dance {
+    0%, 100% { transform: translateY(0); }
+    30%      { transform: translateY(-20px); }
+    60%      { transform: translateY(4px); }
+    80%      { transform: translateY(-6px); }
 }
 
 .keyboard {
@@ -132,7 +183,7 @@ body {
     max-width: 44px;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s ease, transform 0.08s ease;
 }
 
 .key:active {
@@ -148,59 +199,44 @@ body {
 
 .key.correct {
     background-color: #538d4e;
+    transition: background-color 0.5s ease;
 }
 
 .key.present {
     background-color: #b59f3b;
+    transition: background-color 0.5s ease;
 }
 
 .key.absent {
     background-color: #3a3a3c;
+    transition: background-color 0.5s ease;
 }
 
 .spacer-half {
     flex: 0.5;
 }
 
-.tile.revealing {
-    animation: flip 0.35s ease;
-}
-
-@keyframes flip {
-    0%   { transform: rotateX(0deg); }
-    50%  { transform: rotateX(90deg); }
-    100% { transform: rotateX(0deg); }
-}
-
-.tile.pop {
-    animation: pop 0.08s ease;
-}
-
-@keyframes pop {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
-}
-
 .toast {
     position: fixed;
-    top: 60px;
+    top: -50px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #ffffff;
     color: #121213;
     padding: 12px 24px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 700;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: top 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.3s ease;
     opacity: 0;
-    transition: opacity 0.3s;
     pointer-events: none;
     z-index: 100;
     white-space: nowrap;
 }
 
 .toast.show {
+    top: 60px;
     opacity: 1;
 }
 

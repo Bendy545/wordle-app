@@ -123,10 +123,9 @@ export default class extends Controller {
 
         const tile = this.getTile(this.currentRow, this.currentCol);
         tile.textContent = letter;
-        tile.classList.add('filled');
-        tile.classList.remove('pop');
+        tile.classList.remove('filled');
         void tile.offsetWidth;
-        tile.classList.add('pop');
+        tile.classList.add('filled');
         this.currentCol++;
     }
 
@@ -153,9 +152,27 @@ export default class extends Controller {
         return this.element.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
     }
 
+    getRow(row) {
+        return this.element.querySelector(`.row[data-row="${row}"]`);
+    }
+
+    shakeRow() {
+        const row = this.getRow(this.currentRow);
+        if (!row) return;
+
+        row.classList.remove('shake');
+        void row.offsetWidth;
+        row.classList.add('shake');
+
+        row.addEventListener('animationend', () => {
+            row.classList.remove('shake');
+        }, { once: true });
+    }
+
     async submitGuess() {
         if (this.gameOver || this.isRevealing) return;
         if (this.currentCol < this.maxColsValue) {
+            this.shakeRow();
             this.showMessage('Not enough letters');
             return;
         }
@@ -175,6 +192,7 @@ export default class extends Controller {
 
             if (!response.ok) {
                 this.isRevealing = false;
+                this.shakeRow();
                 this.showMessage(data.error || 'Something went wrong');
                 return;
             }
@@ -194,6 +212,7 @@ export default class extends Controller {
             if (data.won) {
                 this.gameOver = true;
                 this.saveState();
+                await this.danceRow();
                 this.showMessage('Good job');
             } else if (this.currentRow >= this.maxRowsValue - 1) {
                 this.gameOver = true;
@@ -211,23 +230,55 @@ export default class extends Controller {
     }
 
     async revealRow(result) {
-        for (let col = 0; col < result.length; col++) {
-            const tile = this.getTile(this.currentRow, col);
-            const status = result[col].status;
+        const FLIP_HALF = 200;
+        const STAGGER = 280;
 
-            await this.delay(300 * col);
+        const promises = result.map((item, col) => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const tile = this.getTile(this.currentRow, col);
+                    const status = item.status;
 
-            tile.classList.add('revealing');
+                    tile.classList.add('revealing');
 
-            await this.delay(250);
+                    setTimeout(() => {
+                        tile.classList.remove('revealing', 'filled');
+                        tile.classList.add(status, 'reveal-out');
 
-            tile.classList.add(status);
-            tile.classList.remove('filled');
+                        setTimeout(() => {
+                            tile.classList.remove('reveal-out');
+                            resolve();
+                        }, FLIP_HALF);
+                    }, FLIP_HALF);
+                }, STAGGER * col);
+            });
+        });
 
-            tile.classList.remove('revealing');
+        await Promise.all(promises);
+        await this.delay(80);
+    }
+
+    async danceRow() {
+        await this.delay(200);
+
+        const STAGGER = 100;
+        const promises = [];
+
+        for (let col = 0; col < this.maxColsValue; col++) {
+            promises.push(new Promise(resolve => {
+                setTimeout(() => {
+                    const tile = this.getTile(this.currentRow, col);
+                    tile.classList.add('dance');
+
+                    tile.addEventListener('animationend', () => {
+                        tile.classList.remove('dance');
+                        resolve();
+                    }, { once: true });
+                }, STAGGER * col);
+            }));
         }
 
-        await this.delay(100);
+        await Promise.all(promises);
     }
 
     updateKeyboard(result) {
@@ -259,6 +310,8 @@ export default class extends Controller {
         }
 
         toast.textContent = text;
+        toast.classList.remove('show');
+        void toast.offsetWidth;
         toast.classList.add('show');
 
         clearTimeout(this.toastTimeout);
