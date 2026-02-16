@@ -4,8 +4,11 @@ export default class extends Controller {
     static values = {
         maxRows: { type: Number, default: 6},
         maxCols: { type: Number, default: 5},
-        slotId: { type: String, default: ''}
+        slotId: { type: String, default: ''},
+        nextRotation: { type: String, default: ''}
     }
+
+    static targets = ['countdown']
 
     connect() {
         this.currentRow = 0;
@@ -13,6 +16,7 @@ export default class extends Controller {
         this.gameOver = false;
         this.isRevealing = false;
         this.guesses = [];
+        this.countdownInterval = null;
 
         this.handlePhysicalKeyboard = this.handlePhysicalKeyboard.bind(this);
         document.addEventListener('keydown', this.handlePhysicalKeyboard);
@@ -22,6 +26,7 @@ export default class extends Controller {
 
     disconnect() {
         document.removeEventListener('keydown', this.handlePhysicalKeyboard);
+        this.stopCountdown();
     }
 
     getStorageKey() {
@@ -72,6 +77,8 @@ export default class extends Controller {
                 } else {
                     this.showMessage(`The word was ${lastGuess.answer}`);
                 }
+
+                this.startCountdown();
             }
         } catch (e) {
 
@@ -214,10 +221,12 @@ export default class extends Controller {
                 this.saveState();
                 await this.danceRow();
                 this.showMessage('Good job');
+                this.startCountdown();
             } else if (this.currentRow >= this.maxRowsValue - 1) {
                 this.gameOver = true;
                 this.saveState();
                 this.showMessage(`The word was ${data.answer}`);
+                this.startCountdown();
             } else {
                 this.saveState();
                 this.currentRow++;
@@ -298,6 +307,58 @@ export default class extends Controller {
                 key.dataset.status = status;
             }
         });
+    }
+
+    startCountdown() {
+        if (!this.nextRotationValue || !this.hasCountdownTarget) return;
+
+        this.nextRotationDate = new Date(this.nextRotationValue);
+        this.tickCountdown();
+
+        this.countdownInterval = setInterval(() => {
+            this.tickCountdown();
+        }, 1000);
+    }
+
+    stopCountdown() {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+    }
+
+    tickCountdown() {
+        const now = new Date();
+        const diff = this.nextRotationDate - now;
+
+        if (diff <= 0) {
+            this.stopCountdown();
+            this.countdownTarget.innerHTML = '<span class="countdown-label">New word available!</span>';
+            this.countdownTarget.classList.add('visible');
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+            return;
+        }
+
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+
+        const pad = (n) => String(n).padStart(2, '0');
+
+        this.countdownTarget.innerHTML =
+            `<span class="countdown-label">Next word in</span>` +
+            `<span class="countdown-time">` +
+                `<span class="countdown-segment"><span class="countdown-number">${pad(hours)}</span><span class="countdown-unit">h</span></span>` +
+                `<span class="countdown-separator">:</span>` +
+                `<span class="countdown-segment"><span class="countdown-number">${pad(minutes)}</span><span class="countdown-unit">m</span></span>` +
+                `<span class="countdown-separator">:</span>` +
+                `<span class="countdown-segment"><span class="countdown-number">${pad(seconds)}</span><span class="countdown-unit">s</span></span>` +
+            `</span>`;
+
+        this.countdownTarget.classList.add('visible');
     }
 
     showMessage(text) {
