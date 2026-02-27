@@ -299,6 +299,87 @@ body {
     opacity: 1;
 }
 
+.consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(18, 18, 19, 0.95);
+    padding: 14px 20px;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.35s ease;
+    text-align: center;
+}
+.consent-banner.visible {
+    transform: translateY(0);
+}
+.consent-banner p {
+    font-size: 0.85rem; color: #ccc; margin-bottom: 10px;
+}
+.consent-buttons {
+    display: flex; gap: 10px; justify-content: center;
+}
+.consent-btn {
+    padding: 8px 20px; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+}
+.consent-accept {
+    background: #538d4e; color: #fff;
+}
+.consent-decline {
+    background: #3a3a3c; color: #fff;
+}
+
+.analytics-container {
+    max-width: 800px; margin: 0 auto; padding: 20px 16px 40px;
+    -webkit-user-select: text; user-select: text;
+}
+.analytics-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+.analytics-header h1 {
+    font-size: 1.5rem;
+}
+.analytics-header a {
+    color: #fff; text-decoration: none; font-size: 0.85rem; opacity: 0.8;
+}
+.stats-overview {
+    display: flex; gap: 16px; margin-bottom: 24px;
+}
+.stat-card {
+    flex: 1; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; text-align: center;
+}
+.stat-number {
+    display: block; font-size: 2rem; font-weight: 700;
+}
+.stat-label {
+    font-size: 0.75rem; opacity: 0.7; text-transform: uppercase;
+}
+.analytics-section {
+    margin-bottom: 24px;
+}
+.analytics-section h2 {
+    font-size: 1rem; margin-bottom: 8px; opacity: 0.9;
+}
+.analytics-table {
+    width: 100%; border-collapse: collapse; font-size: 0.9rem;
+}
+.analytics-table th, .analytics-table td {
+    padding: 7px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.analytics-table th {
+    font-size: 0.75rem; text-transform: uppercase; opacity: 0.7;
+}
+.no-data {
+    font-size: 0.85rem; opacity: 0.5; font-style: italic;
+}
+
+body:has(.analytics-container), html:has(.analytics-container) {
+    overflow: auto; height: auto;
+}
+
 @media (max-height: 600px) {
     .game-header { padding: 4px 0; }
     .board { padding: 4px 0; }

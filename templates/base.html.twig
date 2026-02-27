@@ -14,5 +14,13 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+
+        <div class="consent-banner" data-controller="consent">
+            <p>We are using cookies for traffic measurement.</p>
+            <div class="consent-buttons">
+                <button class="consent-btn consent-accept" data-action="click->consent#accept">Accept</button>
+                <button class="consent-btn consent-decline" data-action="click->consent#decline">Decline</button>
+            </div>
+        </div>
     </body>
 </html>

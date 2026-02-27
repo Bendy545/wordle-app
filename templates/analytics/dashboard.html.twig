@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Analytics – ITordle{% endblock %}
+
+{% block body %}
+<div class="analytics-container">
+    <header class="analytics-header">
+        <h1>Traffic</h1>
+        <a href="{{ path('app_home') }}">← Back</a>
+    </header>
+
+    <div class="stats-overview">
+        <div class="stat-card">
+            <span class="stat-number">{{ total }}</span>
+            <span class="stat-label">Total visits</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ unique }}</span>
+            <span class="stat-label">Unique</span>
+        </div>
+    </div>
+
+    {% for section, label in { bySource: 'Source (utm_source)', byMedium: 'Channels (utm_medium)', byCampaign: 'Campaigns (utm_campaign)' } %}
+    <section class="analytics-section">
+        <h2>{{ label }}</h2>
+        {% set rows = attribute(_context, section) %}
+        {% if rows is not empty %}
+        <table class="analytics-table">
+            <thead><tr><th>Name</th><th>Visits</th><th>Unique</th></tr></thead>
+            <tbody>
+                {% for row in rows %}
+                <tr><td>{{ row.label }}</td><td>{{ row.visits }}</td><td>{{ row.uniq }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="no-data">No data.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}
