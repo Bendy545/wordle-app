@@ -34,6 +34,14 @@ class GameApiController extends AbstractController
 
         $slotId = $state->getSlotDate()->format('Y-m-d') . '-' . $state->getCurrentSlot();
 
+        $clientSlotId = $data['slotId'] ?? null;
+        if ($clientSlotId && $clientSlotId !== $slotId) {
+            return $this->json([
+                'error' => 'expired',
+                'message' => 'The word has changed! Reloading…'
+            ], 409);
+        }
+
         $session = $requestStack->getSession();
         $sessionKey = 'wordle_' . $slotId;
         $attempts = $session->get($sessionKey, 0);
