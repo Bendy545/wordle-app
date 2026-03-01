@@ -192,10 +192,17 @@ export default class extends Controller {
             const response = await fetch('/api/guess', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({guess}),
+                body: JSON.stringify({guess, slotId: this.slotIdValue}),
             })
 
             const data = await response.json();
+
+            if (response.status === 409) {
+                this.isRevealing = false;
+                this.showMessage(data.message || 'Word changed! Reloading…');
+                setTimeout(() => window.location.reload(), 1500);
+                return;
+            }
 
             if (!response.ok) {
                 this.isRevealing = false;
