@@ -8,7 +8,7 @@ html, body {
     height: 100%;
     height: 100dvh;
     overflow: hidden;
-    overscroll-behavior: none; 
+    overscroll-behavior: none;
 }
 
 body {
@@ -35,19 +35,19 @@ body:has(.analytics-container), html:has(.analytics-container) {
     max-width: 500px;
     height: 100%;
     height: 100dvh;
-    padding: 0 6px;
+    padding: env(safe-area-inset-top, 0) 6px 0;
 }
 
 .game-header {
     width: 100%;
     text-align: center;
-    padding: 8px 0;
+    padding: clamp(2px, 0.8vh, 8px) 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
 }
 
 .game-header h1 {
-    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -58,25 +58,25 @@ body:has(.analytics-container), html:has(.analytics-container) {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(4px, 1vw, 6px);
+    gap: clamp(2px, 0.5vh, 6px);
     flex: 1;
     min-height: 0;
-    padding: 8px 0;
+    padding: clamp(2px, 0.5vh, 8px) 0;
 }
 
 .row {
     display: flex;
-    gap: clamp(4px, 1vw, 6px);
+    gap: clamp(2px, 0.5vh, 6px);
 }
 
 .tile {
-    width: clamp(48px, 12vw, 62px);
-    height: clamp(48px, 12vw, 62px);
+    width: clamp(32px, min(12vw, 7vh), 62px);
+    height: clamp(32px, min(12vw, 7vh), 62px);
     border: 2px solid #a3a3a3;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-size: clamp(1rem, min(4vw, 2.8vh), 2rem);
     font-weight: 700;
     text-transform: uppercase;
     color: #ffffff;
@@ -166,7 +166,7 @@ body:has(.analytics-container), html:has(.analytics-container) {
 .countdown.visible {
     max-height: 80px;
     opacity: 1;
-    padding: 6px 0 2px;
+    padding: clamp(2px, 0.5vh, 6px) 0 clamp(1px, 0.3vh, 2px);
 }
 
 .countdown-label {
@@ -191,7 +191,7 @@ body:has(.analytics-container), html:has(.analytics-container) {
 }
 
 .countdown-number {
-    font-size: 1.4rem;
+    font-size: clamp(1rem, 2vh, 1.4rem);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     min-width: 1.7em;
@@ -216,32 +216,31 @@ body:has(.analytics-container), html:has(.analytics-container) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(3px, 0.8vw, 6px);
-    padding: 6px 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    gap: clamp(3px, 0.6vw, 6px);
+    padding: clamp(6px, 1.5vh, 20px);
+    padding-bottom: max(clamp(6px, 1.5vh, 20px), env(safe-area-inset-bottom));
     width: 100%;
     flex-shrink: 0;
     background-color: whitesmoke;
-    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 5px black;
 }
 
 .keyboard-row {
     display: flex;
-    gap: clamp(3px, 0.8vw, 6px);
+    gap: clamp(2px, 0.6vw, 6px);
     justify-content: center;
     width: 100%;
 }
 
 .key {
-    height: clamp(46px, 8vh, 58px);
+    height: clamp(32px, 5.5vh, 54px);
     padding: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: clamp(4px, 1vw, 6px);
     background-color: #000000;
     color: #ffffff;
-    font-size: clamp(0.7rem, 2.2vw, 0.85rem);
+    font-size: clamp(0.6rem, 2vw, 0.85rem);
     font-weight: 700;
     cursor: pointer;
     display: flex;
@@ -264,7 +263,7 @@ body:has(.analytics-container), html:has(.analytics-container) {
 .key-wide {
     max-width: 65px;
     flex: 1.5;
-    font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+    font-size: clamp(0.55rem, 1.6vw, 0.75rem);
 }
 
 .key.correct {
@@ -396,24 +395,57 @@ body:has(.analytics-container), html:has(.analytics-container) {
     .board { padding: 4px 0; }
 
     .tile {
-        width: clamp(40px, 10vw, 50px);
-        height: clamp(40px, 10vw, 50px);
-        font-size: clamp(1.2rem, 4vw, 1.6rem);
+        width: clamp(36px, 10vw, 50px);
+        height: clamp(36px, 10vw, 50px);
+        font-size: clamp(1rem, 3.5vw, 1.6rem);
     }
 
     .key {
-        height: clamp(40px, 7vh, 48px);
+        height: clamp(34px, 6vh, 48px);
+    }
+}
+
+@media (max-width: 400px) {
+    .tile {
+        width: clamp(36px, 15vw, 48px);
+        height: clamp(36px, 15vw, 48px);
+        font-size: clamp(1rem, 4vw, 1.4rem);
+    }
+
+    .row, .board {
+        gap: 3px;
+    }
+
+    .keyboard-row, .keyboard {
+        gap: 2px;
+    }
+
+    .keyboard {
+        padding: 10px 4px;
+    }
+
+    .key {
+        font-size: 0.65rem;
+        border-radius: 4px;
+        margin: 0.5px;
+    }
+
+    .key-wide {
+        max-width: 55px;
+        font-size: 0.55rem;
     }
 }
 
 @media (max-width: 340px) {
     .tile {
-        width: 42px;
-        height: 42px;
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        border-width: 1.5px;
     }
 
     .row, .board {
-        gap: 3px;
+        gap: 2px;
     }
 
     .keyboard-row, .keyboard {
@@ -421,30 +453,35 @@ body:has(.analytics-container), html:has(.analytics-container) {
     }
 
     .key {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
+        height: 36px;
     }
 
     .key-wide {
-        max-width: 55px;
+        max-width: 48px;
     }
 }
 
 @media (max-height: 440px) and (orientation: landscape) {
     .tile {
-        width: clamp(32px, 8vh, 42px);
-        height: clamp(32px, 8vh, 42px);
+        width: clamp(28px, 8vh, 42px);
+        height: clamp(28px, 8vh, 42px);
     }
 
     .row, .board {
-        gap: 3px;
+        gap: 2px;
     }
 
     .key {
-        height: clamp(32px, 7vh, 40px);
+        height: clamp(28px, 6vh, 40px);
     }
 
     .keyboard-row, .keyboard {
         gap: 2px;
+    }
+
+    .keyboard {
+        padding: 6px 4px;
     }
 
     .game-header { padding: 2px 0; }
