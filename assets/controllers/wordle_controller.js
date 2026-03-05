@@ -21,7 +21,7 @@ export default class extends Controller {
         this.handlePhysicalKeyboard = this.handlePhysicalKeyboard.bind(this);
         document.addEventListener('keydown', this.handlePhysicalKeyboard);
 
-        this.restoreState();
+        this.restoreStateFromServer();
     }
 
     disconnect() {
@@ -29,32 +29,18 @@ export default class extends Controller {
         this.stopCountdown();
     }
 
-    getStorageKey() {
-        return `itordle_${this.slotIdValue}`;
-    }
-
-    saveState() {
-        const state = {
-            slotId: this.slotIdValue,
-            guesses: this.guesses,
-            gameOver: this.gameOver
-        };
-
-        localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
-    }
-
-    restoreState() {
+    async restoreStateFromServer() {
         if (!this.slotIdValue) return;
 
-        const raw = localStorage.getItem(this.getStorageKey());
-        if (!raw) return;
-
         try {
-            const state = JSON.parse(raw);
+            const response = await fetch('/api/game-state');
+            if (!response.ok) return;
 
-            if (state.slotId !== this.slotIdValue) return;
+            const data = await response.json();
 
-            for (const guess of state.guesses) {
+            if (data.slotId !== this.slotIdValue) return;
+
+            for (const guess of data.guesses) {
                 for (let col = 0; col < guess.result.length; col++) {
                     const tile = this.getTile(this.currentRow, col);
                     tile.textContent = guess.result[col].letter;
@@ -64,37 +50,20 @@ export default class extends Controller {
                 this.currentRow++;
             }
 
-            this.guesses = state.guesses;
+            this.guesses = data.guesses;
             this.currentCol = 0;
-            this.gameOver = state.gameOver;
+            this.gameOver = data.gameOver;
 
             if (this.gameOver) {
-                const lastGuess = state.guesses[state.guesses.length - 1];
-                const won = lastGuess.won;
-
-                if (won) {
+                if (data.won) {
                     this.showMessage('Good job');
                 } else {
-                    this.showMessage(`The word was ${lastGuess.answer}`);
+                    this.showMessage(`The word was ${data.answer}`);
                 }
-
                 this.startCountdown();
             }
         } catch (e) {
-
-        }
-
-        this.cleanupOldSlots();
-    }
-
-    cleanupOldSlots() {
-        const currentKey = this.getStorageKey();
-
-        for (let i = localStorage.length - 1; i >= 0; i--) {
-            const key = localStorage.key(i);
-            if (key.startsWith('itordle_') && key !== currentKey) {
-                localStorage.removeItem(key);
-            }
+            // silently fail, player starts fresh
         }
     }
 
@@ -225,17 +194,14 @@ export default class extends Controller {
 
             if (data.won) {
                 this.gameOver = true;
-                this.saveState();
                 await this.danceRow();
                 this.showMessage('Good job');
                 this.startCountdown();
             } else if (this.currentRow >= this.maxRowsValue - 1) {
                 this.gameOver = true;
-                this.saveState();
                 this.showMessage(`The word was ${data.answer}`);
                 this.startCountdown();
             } else {
-                this.saveState();
                 this.currentRow++;
                 this.currentCol = 0;
             }

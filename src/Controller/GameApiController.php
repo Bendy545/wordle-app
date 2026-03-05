@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Repository\GameStateRepository;
+use App\Repository\PlayerGameRepository;
 use App\Repository\WordRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +16,50 @@ class GameApiController extends AbstractController
 {
     private const MAX_ATTEMPTS = 6;
 
+    #[Route('/api/game-state', name: 'api_game_state', methods: ['GET'])]
+    public function gameState(
+        RequestStack $requestStack,
+        GameStateRepository $gameStateRepository,
+        PlayerGameRepository $playerGameRepository,
+    ): JsonResponse {
+        $state = $gameStateRepository->getSingleton();
+        if (!$state || !$state->getCurrentWord()) {
+            return $this->json(['error' => 'No active game'], 500);
+        }
+
+        $slotId = $state->getSlotDate()->format('Y-m-d') . '-' . $state->getCurrentSlot();
+        $sessionId = $requestStack->getSession()->getId();
+
+        $playerGame = $playerGameRepository->findBySessionAndSlot($sessionId, $slotId);
+
+        if (!$playerGame) {
+            return $this->json([
+                'slotId' => $slotId,
+                'guesses' => [],
+                'gameOver' => false,
+                'won' => false,
+                'answer' => null,
+            ]);
+        }
+
+        return $this->json([
+            'slotId' => $slotId,
+            'guesses' => $playerGame->getGuesses(),
+            'gameOver' => $playerGame->isGameOver(),
+            'won' => $playerGame->hasWon(),
+            'answer' => $playerGame->isGameOver() ? $playerGame->getAnswer() : null,
+        ]);
+    }
+
     #[Route('/api/guess', name: 'api_guess', methods: ['POST'])]
-    public function guess(Request $request, RequestStack $requestStack, GameStateRepository $gameStateRepository, WordRepository $wordRepository): JsonResponse {
+    public function guess(
+        Request $request,
+        RequestStack $requestStack,
+        GameStateRepository $gameStateRepository,
+        WordRepository $wordRepository,
+        PlayerGameRepository $playerGameRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $guess = strtoupper(trim($data['guess'] ?? ''));
 
@@ -42,11 +86,14 @@ class GameApiController extends AbstractController
             ], 409);
         }
 
-        $session = $requestStack->getSession();
-        $sessionKey = 'wordle_' . $slotId;
-        $attempts = $session->get($sessionKey, 0);
+        $sessionId = $requestStack->getSession()->getId();
+        $playerGame = $playerGameRepository->getOrCreate($sessionId, $slotId);
 
-        if ($attempts >= self::MAX_ATTEMPTS) {
+        if ($playerGame->isGameOver()) {
+            return $this->json(['error' => 'Game already finished'], 400);
+        }
+
+        if ($playerGame->getAttemptCount() >= self::MAX_ATTEMPTS) {
             return $this->json(['error' => 'No attempts remaining'], 400);
         }
 
@@ -54,21 +101,32 @@ class GameApiController extends AbstractController
         $result = $this->evaluate($guess, $answer);
         $won = $guess === $answer;
 
-        $attempts++;
-        $session->set($sessionKey, $attempts);
+        $playerGame->addGuess([
+            'word' => $guess,
+            'result' => $result,
+            'won' => $won,
+        ]);
 
-        $gameOver = $won || $attempts >= self::MAX_ATTEMPTS;
+        $gameOver = $won || $playerGame->getAttemptCount() >= self::MAX_ATTEMPTS;
+
+        if ($gameOver) {
+            $playerGame->setGameOver(true);
+            $playerGame->setWon($won);
+            $playerGame->setAnswer($answer);
+        }
+
+        $em->flush();
 
         $response = [
             'result' => $result,
             'won' => $won,
-            'slotId' => $slotId
+            'slotId' => $slotId,
         ];
 
         if ($gameOver) {
             $response['answer'] = $answer;
         }
-        
+
         return $this->json($response);
     }
 
@@ -81,9 +139,9 @@ class GameApiController extends AbstractController
 
         for ($i = 0; $i < 5; $i++) {
             if ($guessLetters[$i] === $answerLetters[$i]) {
-                $result[$i] = ['letter' => $guessLetters[$i],'status' => 'correct',];
+                $result[$i] = ['letter' => $guessLetters[$i], 'status' => 'correct'];
             } else {
-                $result[$i] = ['letter' => $guessLetters[$i],'status' => 'absent',];
+                $result[$i] = ['letter' => $guessLetters[$i], 'status' => 'absent'];
                 $remaining[] = $answerLetters[$i];
             }
         }
