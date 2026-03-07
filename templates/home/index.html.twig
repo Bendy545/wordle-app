@@ -5,8 +5,57 @@
 {% block body %}
 <div class="game-container" data-controller="wordle" data-wordle-slot-id-value="{{ slotId }}" data-wordle-next-rotation-value="{{ nextRotationUtc }}">
     
-    <header class="game-header">
-        <h1>ITordle</h1>
+    <header class="game-header" data-controller="help">
+        <div class="header-inner">
+            <div class="header-spacer"></div>
+            <h1>ITordle</h1>
+            <button class="help-btn" data-action="click->help#open" aria-label="How to play">?</button>
+        </div>
+
+        <div class="help-overlay" data-help-target="modal" data-action="click->help#backdropClose">
+            <div class="help-modal">
+                <div class="term-bar">
+                    <span class="term-title">~/itordle --help</span>
+                    <button class="help-close" data-action="click->help#close" aria-label="Close">&times;</button>
+                </div>
+                <div class="term-body" data-help-target="terminal">
+                    <div class="term-line">Guess the 5-letter <span class="term-highlight">IT word</span> in 6 tries.</div>
+                    <div class="term-line">Each guess must be a valid tech term.</div>
+                    <div class="term-line">The word rotates throughout the school day.</div>
+                    <div class="term-line">&nbsp;</div>
+                    <div class="term-line"><span class="term-heading">OUTPUT CODES</span></div>
+                    <div class="term-line">&nbsp;</div>
+                    <div class="term-line">
+                        <span class="help-tile correct">P</span>
+                        <span class="help-tile">R</span>
+                        <span class="help-tile">O</span>
+                        <span class="help-tile">X</span>
+                        <span class="help-tile">Y</span>
+                        <span class="term-comment"> # correct spot</span>
+                    </div>
+                    <div class="term-line">&nbsp;</div>
+                    <div class="term-line">
+                        <span class="help-tile">D</span>
+                        <span class="help-tile">E</span>
+                        <span class="help-tile present">B</span>
+                        <span class="help-tile">U</span>
+                        <span class="help-tile">G</span>
+                        <span class="term-comment"> # wrong spot</span>
+                    </div>
+                    <div class="term-line">&nbsp;</div>
+                    <div class="term-line">
+                        <span class="help-tile">C</span>
+                        <span class="help-tile">A</span>
+                        <span class="help-tile">C</span>
+                        <span class="help-tile">H</span>
+                        <span class="help-tile absent">E</span>
+                        <span class="term-comment"> # not in word</span>
+                    </div>
+                    <div class="term-line">&nbsp;</div>
+                    <div class="term-line"><span class="term-prompt">$</span> <span class="term-cursor">█</span></div>
+                </div>
+            </div>
+        </div>
     </header>
 
     <div class="board">
