@@ -69,6 +69,7 @@ export default class extends Controller {
 
     handlePhysicalKeyboard(event) {
         if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (document.querySelector('.help-overlay.visible')) return;
 
         const key = event.key;
 
