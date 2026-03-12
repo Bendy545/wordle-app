@@ -2,12 +2,12 @@
     "controllers": {
         "@symfony/ux-turbo": {
             "turbo-core": {
-                "enabled": true,
-                "fetch": "eager"
+                "enabled": false,
+                "fetch": "lazy"
             },
             "mercure-turbo-stream": {
                 "enabled": false,
-                "fetch": "eager"
+                "fetch": "lazy"
             }
         }
     },
