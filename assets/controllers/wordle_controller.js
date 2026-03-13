@@ -174,10 +174,10 @@ export default class extends Controller {
                 return;
             }
 
-            if (!response.ok) {
+            if (data.error) {
                 this.isRevealing = false;
                 this.shakeRow();
-                this.showMessage(data.error || 'Something went wrong');
+                this.showMessage(data.error);
                 return;
             }
 

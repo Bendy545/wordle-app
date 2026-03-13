@@ -64,11 +64,11 @@ class GameApiController extends AbstractController
         $guess = strtoupper(trim($data['guess'] ?? ''));
 
         if (strlen($guess) !== 5 || !ctype_alpha($guess)) {
-            return $this->json(['error' => 'Invalid guess'], 400);
+            return $this->json(['error' => 'Invalid guess']);
         }
 
         if (!$wordRepository->wordExists($guess)) {
-            return $this->json(['error' => 'Not in word list'], 400);
+            return $this->json(['error' => 'Not in word list']);
         }
 
         $state = $gameStateRepository->getSingleton();
@@ -90,11 +90,11 @@ class GameApiController extends AbstractController
         $playerGame = $playerGameRepository->getOrCreate($sessionId, $slotId);
 
         if ($playerGame->isGameOver()) {
-            return $this->json(['error' => 'Game already finished'], 400);
+            return $this->json(['error' => 'Game already finished']);
         }
 
         if ($playerGame->getAttemptCount() >= self::MAX_ATTEMPTS) {
-            return $this->json(['error' => 'No attempts remaining'], 400);
+            return $this->json(['error' => 'No attempts remaining']);
         }
 
         $answer = strtoupper($state->getCurrentWord()->getName());
